@@ -1,9 +1,13 @@
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Scanner;
 
 /**
  * classe che rappresenta il garage
  * @author gabriele
- * @version 1
+ * @version 2
  * */
 
 public class Garage
@@ -57,7 +61,7 @@ public class Garage
 	}
 
 	/**
-	 * cercaVeicolo --> in base alla targa che andrà inserita in input alla funzione trova il veicolo corrispondente
+	 * cercaVeicolo --> in base alla targa che andrà inserita in entrata alla funzione trova il veicolo corrispondente
 	 * @param trg la targa del veicolo
 	 * @return i l'indice del veicolo
 	 * */
@@ -68,7 +72,7 @@ public class Garage
 		boolean flgTrovato = false;
 		for (i=0; i< nPosti && !flgTrovato; i++)
 		{
-			if (posti[i].getTarga().equals(trg) && posti[i].getTarga() != null)
+			if ((posti[i] != null) && posti[i].targa.equals(trg))
 			{
 				flgTrovato = true;
 			}
@@ -85,10 +89,10 @@ public class Garage
 	}
 
 	/**
-	 * stampaVeicolo --> in base alla targa che andrà inserita in input alla funzione verranno stampati gli attributi di quel veicolo
+	 * stampaVeicolo --> in base alla targa che andrà inserita in entrata alla funzione verranno stampati gli attributi di quel veicolo
 	 * @param trg la targa del veicolo
 	 * */
-	public void stampaVeicolo(String trg){
+	public void stampaVeicolo(String trg){ //modificare l'ora d'ingresso in data d'ingresso
 
 		for (int i=0; i < nPosti; i++)
 		{
@@ -96,7 +100,7 @@ public class Garage
 				if (posti[i].getTarga().equals(trg)) {
 					System.out.println("marca: " + posti[i].marca);
 					System.out.println("nome: " + posti[i].nome);
-					System.out.println("ora ingresso: " + posti[i].oraIngresso);
+					System.out.println("ora ingresso: " + posti[i].dataArrivo);
 					System.out.println("targa: " + posti[i].targa);
 					System.out.println("tipologia veicolo: " + posti[i].getClass());
 				}
@@ -118,21 +122,20 @@ public class Garage
 	}
 
 	/**
-	 * pagaParcheggio --> in base al posto e all'ora di uscita verrà fatto pagare il parcheggio al proprietario del veicolo
-	 * @param pos il numero del parcheggio del veicolo
-	 * @param oraUscita ora di uscita dal garage
+	 * pagaParcheggio --> in base al posto, al tipo di veicolo e al tempo trascorso all'interno del parcheggio verrà fatto pagare il un importo al proprietario del veicolo
+	 * @param numOreTrascorse il numero di ore trascorse all'interno del garage
 	 * */
-	public void pagaParcheggio(int pos, int oraUscita)
+	public void pagaParcheggio(double numOreTrascorse)
 	{
 		Scanner in = new Scanner(System.in);
 		System.out.println("che tipo di veicolo sta ritirando? [1] - auto / [2] - moto");
 		int scelta;
-		int prezzoDaPagare;
+		double prezzoDaPagare;
 		scelta = in.nextInt();
 		if (scelta == 1){
-			prezzoDaPagare = (oraUscita - posti[pos].oraIngresso) * costoOrarioAuto;
+			prezzoDaPagare = numOreTrascorse * costoOrarioAuto;
 		} else {
-			prezzoDaPagare = oraUscita - posti[pos].oraIngresso * costoOrarioMoto;
+			prezzoDaPagare = numOreTrascorse * costoOrarioMoto;
 		}
 
 		System.out.println("prezzoDaPagare = " + prezzoDaPagare);
@@ -149,25 +152,43 @@ public class Garage
 	}
 
 	/**
-	 * uscitaVeicolo --> chiede l'orario di uscita dal parcheggio, che servirà alla funzione del pagamento per il calcolo dell'importo da pagare
+	 * uscitaVeicolo --> in base all'orario dell'orologio del pc nella vita reale, verrà calcolato l'importo da pagare
 	 * */
 	public void uscitaVeicolo()
 	{
-		Scanner in = new Scanner(System.in);
+
 		String targa;
-
-		System.out.println("inserire l'orario di uscita del veicolo");
-
-		int oraUscita = in.nextInt();
-
+		Date dataUscita = new Date();
+		Date dataArrivo;
 		System.out.println("Inserire il numero di targa ");
 		targa = leggiStringa();
 
+		double oraArrivo, oraPartenza, tempoTrascorso;
+
 		int pos = cercaVeicolo(targa);
-		if (pos!=-1)
-		{
-			pagaParcheggio(pos, oraUscita);
-			posti[pos] = null;
+		if (pos!=-1) {
+
+			try {
+
+				dataArrivo = posti[pos].dataArrivo;
+				oraArrivo = dataArrivo.getTime();
+				oraPartenza = dataUscita.getTime();
+
+				System.out.println("Arrivo : "+dataArrivo);
+				System.out.println("Partenza: "+dataUscita);
+
+				tempoTrascorso = oraPartenza-oraArrivo;
+				double numOre = tempoTrascorso/3600000;
+
+				numOre = Math.ceil(numOre);
+				System.out.println("tempo trascorso in ore arrotondato per eccesso " + numOre);
+
+				pagaParcheggio(numOre);
+				posti[pos] = null;
+			} catch (Exception e) {
+				System.out.println("formato data non corretto");
+			}
+
 		}
 		else
 		{
@@ -182,16 +203,17 @@ public class Garage
 	 * Se è una moto, parcheggia in uno dei posti che vanno da 15 a 25, solo se liberi.
 	 * */
 
-	public void entrataVeicolo()
+	public void entrataVeicolo() throws ParseException //modificare questo
 	{
+
 		int scelta;
 		Scanner sc = new Scanner (System.in);
 
 		do {
-			System.out.println("1. Auto");
-			System.out.println("2. Moto");
-			System.out.println("0. Esci");
-			System.out.println("Inserisci la tua scelta ");
+
+			for (String s : Arrays.asList("sta entrando un nuovo veicolo? ", "1. Auto", "2. Moto", "0. Esci", "Inserisci la tua scelta ")) {
+				System.out.println(s);
+			}
 			scelta = sc.nextInt();
 
 			switch(scelta)
@@ -211,11 +233,23 @@ public class Garage
 						String nome = sc.next();
 						System.out.println("Inserire la targa");
 						String targa = sc.next();
-						System.out.println("Inserire l'ora di arrivo");
-						int ora = sc.nextInt();
-						Auto a = new Auto(nome,marca,targa,ora);
-						posti[esito] = a;
-						System.out.println("L'auto è stata parcheggiata nel posto "+esito);
+
+						try {
+							System.out.println("inserire data di arrivo nel formato dd/MM/yyyy");
+							String dataArrivoString = sc.next();
+
+							System.out.println("inserire ora di arrivo nel formato HH:mm");
+							String oraArrivo = sc.next();
+							String dataCompleta = dataArrivoString + " " + oraArrivo;
+							SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+							Date dataArrivo = formato.parse(dataCompleta);
+
+							Auto a = new Auto(nome,marca,targa,dataArrivo);
+							posti[esito] = a;
+							System.out.println("L'auto è stata parcheggiata nel posto " + esito);
+						}catch (ParseException e){
+							System.out.println("inserire data nel formato corretto");
+						}
 					}
 					break;
 
@@ -234,12 +268,30 @@ public class Garage
 						String nome = sc.next();
 						System.out.println("Inserire la targa");
 						String targa = sc.next();
-						System.out.println("Inserire l'ora di arrivo");
-						int ora = sc.nextInt();
-						Moto a = new Moto(nome,marca,targa,ora);
-						posti[esito] = a;
-						System.out.println("L'auto è stata parcheggiata nel posto " + esito);
+
+						try {
+							System.out.println("inserire data di arrivo nel formato dd/MM/yyyy");
+							String dataArrivoString = sc.next();
+
+							System.out.println("inserire ora di arrivo nel formato HH:mm");
+							String oraArrivo = sc.next();
+							String dataCompleta = dataArrivoString + " " + oraArrivo;
+							SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+							Date dataArrivo = formato.parse(dataCompleta);
+
+							Moto a = new Moto(nome,marca,targa,dataArrivo);
+							posti[esito] = a;
+							System.out.println("La moto è stata parcheggiata nel posto " + esito);
+						}catch (ParseException e){
+							System.out.println("inserire data nel formato corretto");
+						}
+
+
 					}
+					break;
+
+				case 0:
+					System.out.println("uscita dal menu");
 					break;
 
 				default:

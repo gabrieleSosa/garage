@@ -1,3 +1,5 @@
+import java.util.Date;
+
 /**
  * classe che rappresenta l'automobile
  * è un estensione della classe veicolo, quindi avrà stessi gli metodi e attributi
@@ -9,8 +11,8 @@ public class Auto extends Veicolo{
 	/**
 	 * costruttore auto
 	 * */
-	public Auto (String nome, String marca, String targa, int ora)
+	public Auto (String nome, String marca, String targa, Date dataArrivo)
 	{
-		super(nome,marca,targa,ora);
+		super(nome,marca,targa,dataArrivo);
 	}
 }

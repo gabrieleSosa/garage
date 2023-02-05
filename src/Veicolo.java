@@ -1,3 +1,5 @@
+import java.util.Date;
+
 /**
  * classe che rappresenta un veicolo in generale
  * @author gabriele
@@ -8,17 +10,17 @@ public class Veicolo {
 	protected String nome;
 	protected String marca;
 	protected String targa;
-	protected int oraIngresso;
+	protected Date dataArrivo;
 
 	/**
 	 * costruttore veicolo
 	 * */
-	public Veicolo(String pNome, String pMarca, String pTarga, int pOraArrivo)
+	public Veicolo(String pNome, String pMarca, String pTarga, Date pArrivo)
 	{
 		this.nome = pNome;
 		this.marca = pMarca;
 		this.targa = pTarga;
-		this.oraIngresso = pOraArrivo;
+		this.dataArrivo = pArrivo;
 	}
 
 	public String getNome()
@@ -35,9 +37,9 @@ public class Veicolo {
 	{
 		return this.targa;
 	}
-	public int getOraIngresso()
+	public Date getDataArrivo()
 	{
-		return this.oraIngresso;
+		return this.dataArrivo;
 	}
 
 	public void setNome(String pNome)
@@ -53,9 +55,9 @@ public class Veicolo {
 		this.targa = pTarga;
 	}
 
-	public void setOraIngresso(int pOraIngresso)
+	public void setDataArrivo(Date pArrivo)
 	{
-		this.oraIngresso = pOraIngresso;
+		this.dataArrivo = pArrivo;
 	}
 
 }

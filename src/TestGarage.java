@@ -1,17 +1,17 @@
 import java.util.Scanner;
 
 /**
- * main class
- * qui verranno verrà visualizzato il menù di scelta
+ * classe di test del programma
+ * qui verrà visualizzato il menù di scelta
  * @author gabriele
- * @version 1
+ * @version 2.0
+ * implementazione delle data --> libreria date.java
  * */
 
 public class TestGarage {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 
 		int scelta;
-
 		Garage europa = new Garage();
 
 		do
